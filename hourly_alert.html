@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>정시 알림 웹앱</title>
+    <style>
+      body {
+        font-family: sans-serif;
+        text-align: center;
+        padding: 50px;
+        background-color: #f0f0f0;
+      }
+      h1 {
+        font-size: 2rem;
+      }
+      #status {
+        font-size: 1.5rem;
+        margin-top: 20px;
+        color: #333;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>⏰ 정시 알림 웹앱</h1>
+    <div id="clock"></div>
+    <div id="status">알림 대기 중...</div>
+
+    <script>
+      const statusDiv = document.getElementById("status");
+      const clockDiv = document.getElementById("clock");
+      let lastHour = -1;
+
+      function showNotification(message) {
+        if (Notification.permission === "granted") {
+          new Notification(message);
+        } else {
+          alert(message);
+        }
+      }
+
+      function updateClock() {
+        const now = new Date();
+        const hours = now.getHours().toString().padStart(2, "0");
+        const minutes = now.getMinutes().toString().padStart(2, "0");
+        const seconds = now.getSeconds().toString().padStart(2, "0");
+        clockDiv.innerText = `${hours}:${minutes}:${seconds}`;
+
+        if (
+          minutes === "00" &&
+          seconds === "00" &&
+          now.getHours() !== lastHour
+        ) {
+          lastHour = now.getHours();
+          const message = `정시입니다! ${hours}시가 되었어요. 10분간 휴식하세요.`;
+          showNotification(message);
+          statusDiv.innerText = message;
+          document.body.style.backgroundColor = "#d0f0c0";
+          setTimeout(() => {
+            statusDiv.innerText = "알림 대기 중...";
+            document.body.style.backgroundColor = "#f0f0f0";
+          }, 10000);
+        }
+      }
+
+      setInterval(updateClock, 1000);
+
+      // 알림 권한 요청
+      if (Notification.permission !== "granted") {
+        Notification.requestPermission();
+      }
+    </script>
+  </body>
+</html>
